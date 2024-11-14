@@ -21,7 +21,6 @@ export const useMenuStore = defineStore('menu', () => {
     const route = useRoute();
 
     watch(route, (newRoute) => {
-        // Сбрасываем все флаги `current` в меню
         menuState.value.forEach(item => {
             item.current = item.name === newRoute.name;
         });
