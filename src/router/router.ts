@@ -8,16 +8,15 @@ const routes: Array<RouteRecordRaw> = [
         children: [
             {
                 path: '',
-                name: 'CurrentCurrencies',
-                component: () => import('@/view/CurrentСurrencies.vue')
+                name: 'ExchangeRates',
+                component: () => import('@/views/ExchangeRates.vue')
             },
-            // // Создание || Редактирование
-            // {
-            //     path: '/tender-info',
-            //     name: 'TenderInfo',
-            //     // permission: ['tender:get'], // типизация под кастомные поля
-            //     component: () => import('@/views/tender/TenderInfo.vue')
-            // },
+            {
+                path: 'currency-converter',
+                name: 'CurrencyConverter',
+                // permission: ['tender:get'], // типизация под кастомные поля
+                component: () => import('@/views/CurrencyConverter.vue')
+            }
         ]
     },
 ]
