@@ -45,10 +45,8 @@ export const useExchangeStore = defineStore('exchange', () => {
     const fetchBanksExchangeRates = async () => {
         try {
             const response = await exchangeService.getCurrentRatesBanks()
-            console.log(response, '213')
             banksExchangeRates.value = response.data
         } catch (err) {
-            console.log(err, 'error')
         }
     }
 
