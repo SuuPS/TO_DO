@@ -7,7 +7,7 @@ const dbFilePath = path.join(process.cwd(), 'db.json');  // Используем
 // Данные, которые будут записаны в db.json
 const defaultData = {
     users: [
-        { id: 1, name: 'Жусуп Мунанбеков', password: 'jusup@example.com', role: 'admin' },
+        { login: "jusup", name: 'Жусуп Мунанбеков', password: 'jusup@example.com', role: 'admin' },
     ],
     tasks: []
 };
