@@ -25,10 +25,10 @@ const { getMenuState } = useMenuStore()
           <div class="flex shrink-0 items-center">
             <div class="flex items-start space-x-1 font-bold text-4xl">
               <!-- Синяя часть логотипа -->
-              <span class="text-[#0075B3] italic">i</span>
+              <span class="text-[#0075B3] italic">TO</span>
 
               <!-- Черная часть логотипа с наклоном -->
-              <span class="transform text-white -skew-x-6">инфоком</span>
+              <span class="transform text-white -skew-x-6">DO</span>
             </div>
           </div>
           <div class="hidden sm:ml-6 sm:block">

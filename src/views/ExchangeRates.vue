@@ -5,7 +5,7 @@ import { CombinedExchangeRate } from "@/store/exchange/exchangeTypes.ts";
 import exchangeHelpers from "@/utils/exchangeHelper.ts";
 import {storeToRefs} from "pinia";
 import {onMounted, ref} from "vue";
-import Loader from "@/components/Loader.vue"
+import Loader from "@/components/UI/Loader.vue"
 
 const currentDate = dateHelper.getCurrentDate()
 const { averageExchangeRatesList, bestExchangeRatesList, banksExchangeRatesList} = storeToRefs(useExchangeStore())
