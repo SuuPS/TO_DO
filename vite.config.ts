@@ -8,5 +8,6 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),  // Устанавливаем алиас для "src" папки
     },
-  },
+    extensions: ['.js', '.ts', '.vue'], // Добавьте .vue
+  }
 })

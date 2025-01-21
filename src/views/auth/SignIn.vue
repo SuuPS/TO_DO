@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {onMounted, ref} from "vue";
-import { useExchangeStore } from "@/store/exchange/exchangeStore.ts";
-import { convertCurrency, getCurrencyName } from "@/utils/exchangeHelper.ts";
+import { useExchangeStore } from "@/store/exchange/exchangeStore.js";
+import { convertCurrency, getCurrencyName } from "@/utils/exchangeHelper.js";
 
 const {useUpdatedExchangeRates} = useExchangeStore()
 

@@ -14,22 +14,22 @@ const routes: Array<CustomRouteRecordRaw> = [
         component: () => import('@/components/Navbar.vue'),
         children: [
             {
-                path: 'task-filter',
-                name: 'TaskFilter',
-                component: () => import('@/pages/public/MainPage'),
-            },
-            {
-                path: 'task-filter',
-                name: 'TaskFilter',
-                component: () => import('@/pages/TaskFilter.vue'),
+                path: '/',
+                name: 'Main',
+                component: () => import('@/views/public/MainPage'),
             },
             {
                 path: 'task-list',
                 name: 'TaskList',
                 permission: ['tender:get'], // Кастомное поле для прав доступа
-                component: () => import('@/pages/TaskList.vue'),
+                component: () => import('@/views/tasks/TaskList.vue'),
             },
         ],
+    },
+    {
+        path: '/sign-up',
+        name: 'SignUp',
+        component: () => import('@/views/auth/SignUp.vue'),
     },
 ];
 
