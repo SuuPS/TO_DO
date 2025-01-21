@@ -10,8 +10,9 @@ interface MenuItem {
 
 export const useMenuStore = defineStore('menu', () => {
     const menuState = ref<MenuItem[]>([
-        { title: 'Главная', name: 'ExchangeRates', current: true },
-        { title: 'Конвертация валют', name: 'CurrencyConverter', current: false },
+        { title: 'Главная', name: 'Main', current: true },
+        { title: 'Главная', name: 'TaskFilter', current: false },
+        { title: 'Конвертация валют', name: 'TaskList', current: false },
     ]);
 
     const getMenuState = computed<MenuItem[]>(() => {
