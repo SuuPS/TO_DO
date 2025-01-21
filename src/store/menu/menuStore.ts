@@ -10,8 +10,8 @@ interface MenuItem {
 
 export const useMenuStore = defineStore('menu', () => {
     const menuState = ref<MenuItem[]>([
-        { title: 'Главная', name: 'Main', current: true },
-        { title: 'Задачи', name: 'TaskList', current: false },
+        { title: 'Задачи', name: 'TaskList', current: true },
+        { title: 'Пользователи', name: 'Users', current: false },
     ]);
 
     const getMenuState = computed<MenuItem[]>(() => {

@@ -2,7 +2,7 @@
 import Button from "@/components/UI/Button.vue";
 import Input from "@/components/UI/Input.vue";
 import {computed, reactive, ref} from "vue";
-import {User} from "@/types/User.ts";
+import {UserTypes} from "@/types/userTypes.js";
 import {useAuthStore} from "@/store/auth/authStore.ts";
 import {toast} from 'vue3-toastify';
 import {useRouter} from "vue-router";
@@ -11,7 +11,7 @@ const router = useRouter()
 
 const {signIn} = useAuthStore()
 
-const params = ref<User>({
+const params = ref<UserTypes>({
   login: '',
   password: '',
 })
@@ -23,7 +23,11 @@ const submit = async () => {
       type: 'success',
       autoClose: 1000,
     });
-    await router.push({name: 'Main'})
+    // Явное ожидание завершения тоста (1000 мс)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // После завершения тоста, выполняем переход
+    await router.push({ name: 'TaskList' });
   } catch (error) {
     toast(error, {
       type: 'danger',
@@ -46,12 +50,12 @@ const validate = computed(() => {
 
       <!-- Логин -->
       <Input
-          v-model:value="params.login"
+          v-model:value.trim="params.login"
           title="Логин"/>
 
       <!-- Пароль -->
       <Input
-          v-model:value="params.password"
+          v-model:value.trim="params.password"
           title="Пароль"/>
 
       <!-- Кнопка регистрации -->

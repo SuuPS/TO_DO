@@ -1,67 +1,70 @@
-import {defineStore} from 'pinia';
-import {addUserFetch, getUserByLoginFetch} from "../../services/authService.ts";
-import {User} from "../../types/User.ts";
+import { ref, computed } from 'vue';
+import { defineStore } from 'pinia';
+import { addUserFetch, getUserByLoginFetch } from "../../services/userService.ts";
+import { UserTypes } from "../../types/userTypes.ts";
 
+// Получаем данные пользователя из localStorage, если они есть
 const userFromLS = localStorage.getItem('user')
     ? JSON.parse(localStorage.getItem('user')!)
     : null;
 
-
-interface authType extends User {
+// Интерфейс для типа auth
+interface AuthType extends UserTypes {
     isAuth: boolean;
 }
 
-export const useAuthStore = defineStore('authStore', {
-    state: () => ({
-        auth: userFromLS || {} as authType,  // Указываем тип auth как authType
-    }),
-    actions: {
-        async addUser(params: User) {
-            try {
-                const findUserRes = await getUserByLoginFetch(params.login)
-                if (findUserRes.data.length > 0) {
-                    throw new Error('Пользователь с таким логином уже существует'); // Выбрасываем ошибку
+export const useAuthStore = defineStore('authStore', () => {
+    // Состояние
+    const auth = ref<AuthType>(userFromLS || { isAuth: false } as AuthType);
+
+    // Действия
+    const addUser = async (params: UserTypes) => {
+        try {
+            const findUserRes = await getUserByLoginFetch(params.login);
+            if (findUserRes.data.length > 0) {
+                throw new Error('Пользователь с таким логином уже существует');
+            } else {
+                const response = await addUserFetch(params);
+                auth.value = { ...response.data, isAuth: true };
+                localStorage.setItem('user', JSON.stringify(auth.value));
+            }
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const signIn = async (params: UserTypes) => {
+        try {
+            const findUserRes = await getUserByLoginFetch(params.login);
+            if (findUserRes.data.length > 0) {
+                if (params.password === findUserRes.data[0].password) {
+                    auth.value = { ...findUserRes.data[0], isAuth: true };
+                    localStorage.setItem('user', JSON.stringify(auth.value));
                 } else {
-                    const response = await addUserFetch(params);
-                    this.auth = response.data;
-                    this.auth.isAuth = true
-                    localStorage.setItem('user', JSON.stringify(this.auth))
+                    throw new Error('Неверный пароль');
                 }
-            } catch (error) {
-                throw error;
+            } else {
+                throw new Error('Неверный логин');
             }
-        },
-
-        async signIn(params: User) {
-            try {
-                const findUserRes = await getUserByLoginFetch(params.login)
-                if (findUserRes.data.length > 0){
-                    if (params.password === findUserRes.data[0].password) {
-                        this.auth = findUserRes.data[0];  // Обновляем auth с полученными данными
-                        this.auth.isAuth = true
-                        localStorage.setItem('user', JSON.stringify(this.auth))
-                    } else {
-                        throw new Error('Неверный пароль'); // Более информативно
-                    }
-                }
-                else {
-                    throw new Error('Неверный логин'); // Более информативно
-                }
-
-            } catch (error) {
-                throw error;
-            }
-        },
-        async signOut(params: User) {
-            this.auth = {isAuth: false} as authType;
-            localStorage.removeItem('user');
+        } catch (error) {
+            throw error;
         }
-    },
-    getters: {
-        // Getter для получения текущего авторизованного пользователя
-        currentUser(state) {
-            return state.auth.isAuth ? state.auth : {isAuth: false};  // Если пользователь авторизован, возвращаем его данные
-        }
-    }
-})
+    };
 
+    const signOut = () => {
+        auth.value = { isAuth: false } as AuthType;
+        localStorage.removeItem('user');
+    };
+
+    // Геттеры
+    const currentUser = computed(() => (auth.value.isAuth ? auth.value : { isAuth: false }));
+
+    // Возвращаем всё, что нужно из хранилища
+    return {
+        auth,
+        addUser,
+        signIn,
+        signOut,
+        currentUser,
+    };
+});

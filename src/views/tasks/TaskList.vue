@@ -1,89 +1,93 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import { useExchangeStore } from "@/store/exchange/exchangeStore.js";
-import { convertCurrency, getCurrencyName } from "@/utils/exchangeHelper.js";
+import TaskItem from "@/views/tasks/TaskItem.vue";
+import {storeToRefs} from "pinia";
+import {useTaskStore} from "@/store/task/taskStore.ts";
+import {useUsersStore} from "@/store/users/usersStore.ts";
+import Input from "@/components/UI/Input.vue";
+import Select from "@/components/UI/Select.vue";
+import Button from "@/components/UI/Button.vue";
+import {toast} from "vue3-toastify";
+const { statusList, tasksList } = storeToRefs(useTaskStore())
+const { userList } = storeToRefs(useUsersStore())
 
-const {useUpdatedExchangeRates} = useExchangeStore()
+const { deleteTask } = useTaskStore()
 
-// Получаем данные из магазина и обновленный список валют
-const updatedExchangeRatesList = useUpdatedExchangeRates();
-
-// Загрузка данных при монтировании компонента
-onMounted(async () => {
-  const { fetchAverageExchangeRates } = useExchangeStore();
-  await fetchAverageExchangeRates();
-});
-
-// Реактивные переменные для выбора валюты и количества
-const fromCurrency = ref("usd");
-const toCurrency = ref("usd");
-const amount = ref(0);
-const convertedAmount = ref(0);
-
-// Функция конвертации
-const handleConvertCurrency = () => {
-  const fromRate = updatedExchangeRatesList.value.find(rate => rate.name === fromCurrency.value);
-  const toRate = updatedExchangeRatesList.value.find(rate => rate.name === toCurrency.value);
-
-  if (fromRate && toRate && amount.value > 0) {
-    convertedAmount.value = convertCurrency(fromRate, toRate, amount.value);
-  } else {
-    convertedAmount.value = 0;
+const deleteItem = async (id: string) => {
+  try {
+    const res = await deleteTask(id)
+    toast("Задача удалена", {
+      type: 'success',
+      autoClose: 1000,
+    });
+  } catch (error) {
+    toast(error, {
+      type: 'danger',
+      autoClose: 1000,
+    });
   }
-};
+}
 </script>
 
 <template>
-  <div class="max-w-lg mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg border border-gray-200">
-    <h2 class="text-2xl font-bold mb-6 text-center">Currency Converter</h2>
+  <div class="container mx-auto py-6">
 
-    <form class="space-y-4">
-      <!-- От какой валюты -->
-      <div>
-        <label for="toCurrency" class="block text-sm font-medium text-gray-700">От какой валюты</label>
-        <select v-model="toCurrency" id="toCurrency" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-          <option v-for="currency in updatedExchangeRatesList" :key="currency.name" :value="currency.name" :disabled="currency.name === fromCurrency">
-            {{ currency.name.toUpperCase() }} - {{ getCurrencyName(currency.name) }}
-          </option>
-        </select>
+    <div class="grid grid-cols-12 gap-5">
+      <TaskItem class="col-span-3"/>
+
+      <!-- Таблица задач -->
+      <div class="col-span-9 overflow-x-auto">
+        <table class="table-auto w-full border-collapse border border-gray-200 rounded-lg shadow text-sm">
+          <thead>
+          <tr class="bg-gray-100">
+            <th class="border border-gray-300 px-4 py-2 text-left">Название</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Описание</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Кто выполняет</th>
+            <th class="border border-gray-300 px-4 py-2 text-left">Статус задачи</th>
+            <th class="border border-gray-300 px-4 py-2 text-center">Действия</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+              class="hover:bg-gray-50"
+              v-for="item in tasksList"
+              :key="item.id">
+            <td class="border border-gray-300 px-4 py-2">
+              <Input :disabled="!item.edit" v-model:value="item.name"/>
+            </td>
+            <td class="border border-gray-300 px-4 py-2">
+              <Input :disabled="!item.edit" v-model:value="item.text"/>
+            </td>
+            <td class="border border-gray-300 px-4 py-2">
+              <Select :disabled="!item.edit" :options="userList" v-model:value="item.employee"/>
+            </td>
+            <td class="border border-gray-300 px-4 py-2">
+              <Select :disabled="!item.edit" :options="statusList" v-model:value="item.status"/>
+            </td>
+            <td class="border border-gray-300 px-4 py-2 text-center">
+              <div class="flex space-x-2">
+                <!-- Кнопка "Редактировать" -->
+                <button
+                    :class="item.edit ? '' : 'bg-blue-200'"
+                    @click="item.edit = !item.edit"
+                    class="px-2 py-1 text-sm font-medium text-blue-600 bg-blue-100 rounded">
+                  ✏️ Редактировать
+                </button>
+
+                <!-- Кнопка "Удалить" -->
+                <button
+                    class="px-2 py-1 text-sm font-medium text-red-600 bg-red-100 rounded hover:bg-red-200"
+                    @click="deleteItem(item.id)">
+                  🗑️ Удалить
+                </button>
+              </div>
+
+            </td>
+          </tr>
+          </tbody>
+        </table>
       </div>
 
-      <!-- В какую валюту -->
-      <div>
-        <label for="fromCurrency" class="block text-sm font-medium text-gray-700">В какую валюту</label>
-        <select v-model="fromCurrency" id="fromCurrency" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-          <option v-for="currency in updatedExchangeRatesList" :key="currency.name" :value="currency.name" :disabled="currency.name === toCurrency">
-            {{ currency.name.toUpperCase() }} - {{ getCurrencyName(currency.name) }}
-          </option>
-        </select>
-      </div>
-
-      <!-- Количество для конвертации -->
-      <div>
-        <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
-        <input v-model.number="amount" type="number" id="amount" placeholder="Enter amount" class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
-      </div>
-
-      <!-- Кнопка конвертации -->
-      <div>
-        <button
-            type="button"
-            @click="handleConvertCurrency"
-            :disabled="fromCurrency === toCurrency || amount <= 0"
-            :class="{
-            'bg-indigo-600 hover:bg-indigo-700': fromCurrency !== toCurrency && amount > 0,
-            'bg-gray-400 cursor-not-allowed': fromCurrency === toCurrency || amount <= 0
-          }"
-            class="w-full text-white font-semibold py-2 px-4 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        >
-          Convert
-        </button>
-      </div>
-    </form>
-
-    <!-- Результат конвертации -->
-    <div id="result" class="mt-6 text-center text-lg font-medium text-gray-800">
-      Converted Amount: <span class="text-indigo-600 font-semibold">{{ convertedAmount.toFixed(2) }}</span>
     </div>
   </div>
+
 </template>

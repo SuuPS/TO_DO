@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import {getCurrencyName} from "@/utils/exchangeHelper.ts";
 
 export interface Options {
   id: string,
@@ -10,7 +9,6 @@ interface Props {
   id?: string,
   title?: string,
   disabled?: boolean,
-  style?: string,
   options: Options[]
 }
 
@@ -26,9 +24,10 @@ const props = defineProps<Props>()
         :disabled="disabled"
         v-model="value"
         :id="id"
-        :class="style || 'mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'">
-      <option v-for="currency in options" :key="currency.name" :value="currency.name">
-        {{ currency.name.toUpperCase() }} - {{ getCurrencyName(currency.name) }}
+        :class="disabled ? 'bg-gray-200' : 'bg-white'"
+        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+      <option v-for="currency in options" :key="currency.name" :value="currency.id">
+        {{ currency.name }}
       </option>
     </select>
   </div>

@@ -6,6 +6,7 @@ interface Props {
   disabled?: boolean,
   style?: string,
   placeholder?: string,
+  rows?: string
 }
 
 const value = defineModel('value')
@@ -17,14 +18,15 @@ const props = defineProps<Props>()
   <!-- Количество для конвертации -->
   <div>
     <label :for="id" class="block text-sm font-medium text-gray-700">{{title}}</label>
-    <input
+    <textarea
         :placeholder="placeholder || title + '...'"
         :disabled="disabled"
         v-model="value"
-        :type="type || 'text'"
         :id="id"
-        :class="disabled ? 'bg-gray-200' : ''"
-        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"/>
+        :class="style || 'w-full px-3 py-2 border border-gray-300 rounded-lg text-sm'"
+        :rows="rows">
+
+    </textarea>
   </div>
 </template>
 

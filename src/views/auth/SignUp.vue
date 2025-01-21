@@ -2,7 +2,7 @@
 import Button from "@/components/UI/Button.vue";
 import Input from "@/components/UI/Input.vue";
 import {computed, reactive, ref} from "vue";
-import {User} from "@/types/User.ts";
+import {UserTypes} from "@/types/userTypes.js";
 import {useAuthStore} from "@/store/auth/authStore.ts";
 import {toast} from 'vue3-toastify';
 import {useRouter} from "vue-router";
@@ -11,7 +11,7 @@ const router = useRouter()
 
 const {addUser} = useAuthStore()
 
-const newYser = ref<User>({
+const newYser = ref<UserTypes>({
   login: '',
   name: '',
   password: '',
@@ -24,7 +24,11 @@ const submit = async () => {
       type: 'success',
       autoClose: 1000,
     }); // ToastOptions
-    router.push({name: 'Main'})
+    // Явное ожидание завершения тоста (1000 мс)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // После завершения тоста, выполняем переход
+    await router.push({ name: 'TaskList' });
   } catch (error) {
     toast(error, {
       type: 'danger',
@@ -47,18 +51,18 @@ const validate = computed(() => {
 
       <!-- Логин -->
       <Input
-          v-model:value="newYser.login"
+          v-model:value.trim="newYser.login"
           title="Логин"/>
 
       <!-- ФИО -->
       <Input
-          v-model:value="newYser.name"
+          v-model:value.trim="newYser.name"
           placeholder=""
           title="ФИО"/>
 
       <!-- Пароль -->
       <Input
-          v-model:value="newYser.password"
+          v-model:value.trim="newYser.password"
           title="Пароль"/>
 
       <!-- Кнопка регистрации -->

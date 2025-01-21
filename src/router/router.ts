@@ -16,14 +16,15 @@ const routes: Array<CustomRouteRecordRaw> = [
         children: [
             {
                 path: '/',
-                name: 'Main',
-                component: () => import('@/views/public/MainPage'),
+                name: 'TaskList',
+                permission: [''],
+                component: () => import('@/views/tasks/TaskList.vue'),
             },
             {
-                path: 'task-list',
-                name: 'TaskList',
-                permission: ['tender:get'], // Кастомное поле для прав доступа
-                component: () => import('@/views/tasks/TaskList.vue'),
+                path: 'users',
+                name: 'Users',
+                permission: ['admin'], // Кастомное поле для прав доступа
+                component: () => import('@/views/admin/UserList.vue'),
             },
         ],
     },
