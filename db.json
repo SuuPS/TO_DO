@@ -1,0 +1,41 @@
+{
+  "users": [
+    {
+      "login": "jusup",
+      "name": "Жусуп Мунанбеков",
+      "password": "jusup@example.com",
+      "role": "admin",
+      "id": "2515"
+    },
+    {
+      "id": "c11f",
+      "login": "alisher",
+      "name": "alisher",
+      "password": "alisher"
+    },
+    {
+      "id": "c9b0",
+      "login": "doter2",
+      "name": "doter2",
+      "password": "doter2"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "2847",
+      "name": "Задача 1",
+      "text": "Описание 1",
+      "employee": "c11f",
+      "status": "1",
+      "edit": false
+    },
+    {
+      "id": "50ab",
+      "name": "Задача 2",
+      "text": "Описание 2",
+      "employee": "c9b0",
+      "status": "1",
+      "edit": false
+    }
+  ]
+}

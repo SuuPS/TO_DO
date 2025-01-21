@@ -7,10 +7,14 @@ import Input from "@/components/UI/Input.vue";
 import Select from "@/components/UI/Select.vue";
 import Button from "@/components/UI/Button.vue";
 import {toast} from "vue3-toastify";
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
 import {Task} from "@/types/taskTypes.ts";
+import {hasRoles} from "@/services/adminServices.ts";
 const { statusList, tasksList } = storeToRefs(useTaskStore())
 const { userList } = storeToRefs(useUsersStore())
+import {useAuthStore} from "@/store/auth/authStore.ts";
+
+const { currentUser } = storeToRefs(useAuthStore())
 
 const { deleteTask, editTask, fetchTasks } = useTaskStore()
 
@@ -29,9 +33,9 @@ const deleteItem = async (id: string) => {
   }
 }
 
-const editItem = async (params: TaskItem) => {
+const editItem = async (params: TaskItem, filter = {}) => {
   try {
-    const res = await editTask(params)
+    const res = await editTask(params, filter)
     toast("Задача изменена", {
       type: 'success',
       autoClose: 1000,
@@ -46,8 +50,12 @@ const editItem = async (params: TaskItem) => {
 
 const filterValues = ref<Task>({
   name: '',
-  employee: '',
+  employee: hasRoles(['admin']) ? '' : currentUser.value.id,
   status: ''
+})
+
+onMounted(async ()=>{
+  fetchTasks(filterValues.value)
 })
 
 </script>
@@ -70,6 +78,7 @@ const filterValues = ref<Task>({
                 v-model:value.trim="filterValues.name"/>
 
             <Select
+                v-if="hasRoles(['admin'])"
                 reset="true"
                 title="Статус"
                 class="col-span-3"
@@ -77,6 +86,7 @@ const filterValues = ref<Task>({
                 v-model:value="filterValues.status"/>
 
             <Select
+                v-if="hasRoles(['admin'])"
                 reset="true"
                 title="Кто выполняет"
                 class="col-span-3"
@@ -110,22 +120,37 @@ const filterValues = ref<Task>({
                 v-for="item in tasksList"
                 :key="item.id">
               <td class="border border-gray-300 px-4 py-2">
-                <Input :disabled="!item.edit" v-model:value="item.name"/>
+                <Input
+                    :disabled="!item.edit"
+                    v-model:value="item.name"/>
               </td>
               <td class="border border-gray-300 px-4 py-2">
-                <Input :disabled="!item.edit" v-model:value="item.text"/>
+                <Input
+                    :disabled="!item.edit"
+                    v-model:value="item.text"/>
               </td>
               <td class="border border-gray-300 px-4 py-2">
-                <Select :disabled="!item.edit" :options="userList" v-model:value="item.employee"/>
+                <Select
+                    :disabled="!item.edit"
+                    :options="userList"
+                    v-model:value="item.employee"/>
               </td>
               <td class="border border-gray-300 px-4 py-2">
-                <Select :disabled="!item.edit" :options="statusList" v-model:value="item.status"/>
+                <Select
+                    v-if="hasRoles(['admiin'])"
+                    :disabled="!item.edit"
+                    :options="statusList"
+                    v-model:value="item.status"/>
+                <Select
+                    v-else
+                    :options="statusList"
+                    v-model:value="item.status"/>
               </td>
               <td class="border border-gray-300 px-4 py-2 text-center">
                 <div class="flex space-x-2">
                   <!-- Кнопка "Редактировать" -->
                   <button
-                      v-if="!item.edit"
+                      v-if="!item.edit && hasRoles(['admin'])"
                       @click="item.edit = !item.edit"
                       class="px-2 py-1 text-sm font-medium text-blue-600 bg-blue-100 rounded hover:bg-blue-200">
                     ✏️ Редактировать
@@ -133,13 +158,14 @@ const filterValues = ref<Task>({
 
                   <button
                       v-else
-                      @click="editItem(item)"
+                      @click="editItem(item, filterValues)"
                       class="px-2 py-1 text-sm font-medium bg-green-300 rounded">
                     Сохранить
                   </button>
 
                   <!-- Кнопка "Удалить" -->
                   <button
+                      v-if="hasRoles(['admin'])"
                       class="px-2 py-1 text-sm font-medium text-red-600 bg-red-100 rounded hover:bg-red-200"
                       @click="deleteItem(item.id)">
                     🗑️ Удалить

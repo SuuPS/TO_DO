@@ -33,11 +33,10 @@ export const useTaskStore = defineStore('taskStore', () => {
         }
     };
 
-    const editTask = async (params: Task) => {
-        console.log(params, '234')
+    const editTask = async (params: Task, filter = {}) => {
         try {
             const response = await editTaskFetch(params);
-            fetchTasks()
+            fetchTasks(filter)
         } catch (error) {
             throw error;
         }

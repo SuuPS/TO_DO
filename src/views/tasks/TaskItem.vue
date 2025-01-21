@@ -9,6 +9,10 @@ import {useUsersStore} from "@/store/users/usersStore.ts";
 import {onMounted, ref} from "vue";
 import {Task} from "@/types/taskTypes.ts";
 import {toast} from "vue3-toastify";
+import {hasRoles} from "@/services/adminServices.ts";
+import {useAuthStore} from "@/store/auth/authStore.ts";
+
+const { currentUser } = storeToRefs(useAuthStore())
 
 const { userList } = storeToRefs(useUsersStore())
 
@@ -18,14 +22,14 @@ const { addTask, fetchTasks } = useTaskStore()
 const newTaskt = ref<Task>({
   name: "",
   text: "",
-  employee: "",
+  employee: hasRoles(['admin']) ? '' : currentUser.value.id,
   status: "1"
 })
 
 const reset = () => {
-  newTaskt.value.employee = ''
+  newTaskt.value.name = ''
   newTaskt.value.text = ''
-  newTaskt.value.employee = ''
+  newTaskt.value.employee = hasRoles(['admin']) ? '' : currentUser.value.id
 }
 
 const submit = async () => {
@@ -46,7 +50,6 @@ const submit = async () => {
 
 onMounted(async ()=>{
   fetchUsers()
-  fetchTasks()
 })
 
 </script>
@@ -61,7 +64,7 @@ onMounted(async ()=>{
 
       <Textarea title="Описание" v-model:value.trim="newTaskt.text"/>
 
-      <Select title="Кто выполняет" :options="userList" v-model:value="newTaskt.employee"/>
+      <Select v-if="hasRoles(['admin'])" title="Кто выполняет" :options="userList" v-model:value="newTaskt.employee"/>
 
     </form>
     <div class="mt-4">

@@ -11,6 +11,7 @@ const userFromLS = localStorage.getItem('user')
 // Интерфейс для типа auth
 interface AuthType extends UserTypes {
     isAuth: boolean;
+    role?: string
 }
 
 export const useAuthStore = defineStore('authStore', () => {
@@ -65,6 +66,6 @@ export const useAuthStore = defineStore('authStore', () => {
         addUser,
         signIn,
         signOut,
-        currentUser,
+        currentUser
     };
 });
