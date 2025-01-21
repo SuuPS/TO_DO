@@ -9,15 +9,15 @@ interface ApiConfig extends AxiosRequestConfig {
 
 // Создание экземпляра Axios с базовым URL
 const api: AxiosInstance = axios.create({
-    baseURL: 'https://data.fx.kg/api/v1/',
+    baseURL: 'http://localhost:3000',
 });
 
 // Интерсептор запроса для добавления заголовков и авторизации
 api.interceptors.request.use(
     (config: ApiConfig) => {
-        if (config.headers) {
-            config.headers.Authorization = 'Bearer Du35uaiDw9YWhyJGGRx51npBaCtDbc1QgZtYuNWp633f140d';
-        }
+        // if (config.headers) {
+
+        // }
         return config;
     },
     (error: AxiosError) => {

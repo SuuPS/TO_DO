@@ -1,30 +1,55 @@
-import { defineStore } from 'pinia';
-import axios from 'axios';
+import {defineStore} from 'pinia';
+import {addUserFetch, getUserByLoginFetch} from "../../services/authService.ts";
+import {User} from "../../types/User.ts";
 
-export const useTaskStore = defineStore('authStore', {
+const userFromLS = JSON.parse(localStorage.getItem('auth'))
+
+interface authType extends User {
+    isAuth: boolean;
+}
+
+export const useAuthStore = defineStore('authStore', {
     state: () => ({
-        auth: [],
+        auth: userFromLS || {} as authType,  // Указываем тип auth как authType
     }),
     actions: {
-        async fetchTasks() {
-            const response = await axios.get('http://localhost:3000/tasks');
-            this.tasks = response.data;
-        },
-        async addTask(task) {
-            const response = await axios.post('http://localhost:3000/tasks', task);
-            this.tasks.push(response.data);
-        },
-        async deleteTask(id) {
-            await axios.delete(`http://localhost:3000/tasks/${id}`);
-            this.tasks = this.tasks.filter((task) => task.id !== id);
-        },
-        async updateTask(id, updatedTask) {
-            const response = await axios.put(`http://localhost:3000/tasks/${id}`, updatedTask);
-            const index = this.tasks.findIndex((task) => task.id === id);
-            if (index !== -1) {
-                this.tasks[index] = response.data;
+        async addUser(params: User) {
+            try {
+                const findUserRes = await getUserByLoginFetch(params.login)
+                if (findUserRes.data.length > 0) {
+                    throw new Error('Пользователь с таким логином уже существует'); // Выбрасываем ошибку
+                } else {
+                    const response = await addUserFetch(params);
+                    console.log(response, '123')
+                    this.auth = response.data;  // Обновляем auth с полученными данными
+                    localStorage.setItem('user', JSON.stringify(this.auth))
+                    this.auth.isAuth = true
+                }
+            } catch (error) {
+                throw error;
             }
         },
+
+        async signIn(params: User) {
+            try {
+                const findUserRes = await getUserByLoginFetch(params.login)
+                if (findUserRes.data.length > 0) {
+                    this.auth = findUserRes.data[0];  // Обновляем auth с полученными данными
+                    localStorage.setItem('user', JSON.stringify(this.auth))
+                    this.auth.isAuth = true
+                }
+            } catch (error) {
+                throw error;
+            }
+        },
+        async signOut(params: User) {
+            this.auth = {}
+            localStorage.removeItem('user')
+            this.auth.isAuth = false
+        }
     },
-});
+    getters:{
+
+    }
+})
 

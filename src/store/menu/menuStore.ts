@@ -12,7 +12,6 @@ export const useMenuStore = defineStore('menu', () => {
     const menuState = ref<MenuItem[]>([
         { title: 'Главная', name: 'Main', current: true },
         { title: 'Задачи', name: 'TaskList', current: false },
-        { title: 'РОег', name: 'SignUp', current: false },
     ]);
 
     const getMenuState = computed<MenuItem[]>(() => {

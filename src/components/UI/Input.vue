@@ -18,7 +18,7 @@ const props = defineProps<Props>()
   <div>
     <label :for="id" class="block text-sm font-medium text-gray-700">{{title}}</label>
     <input
-        :placeholder="placeholder"
+        :placeholder="placeholder || title + '...'"
         :disabled="disabled"
         v-model="value"
         :type="type || 'text'"
