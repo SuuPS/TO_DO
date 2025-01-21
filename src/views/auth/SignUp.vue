@@ -5,6 +5,9 @@ import {computed, reactive, ref} from "vue";
 import {User} from "@/types/User.ts";
 import {useAuthStore} from "@/store/auth/authStore.ts";
 import {toast} from 'vue3-toastify';
+import {useRouter} from "vue-router";
+
+const router = useRouter()
 
 const {addUser} = useAuthStore()
 
@@ -21,6 +24,7 @@ const submit = async () => {
       type: 'success',
       autoClose: 1000,
     }); // ToastOptions
+    router.push({name: 'Main'})
   } catch (error) {
     toast(error, {
       type: 'danger',

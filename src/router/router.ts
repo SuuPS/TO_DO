@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import {useAuthStore} from "../store/auth/authStore.ts";
 
 // Расширяем стандартный тип маршрута, добавляя кастомное поле `permission`
 interface CustomRouteRecordRaw extends Omit<RouteRecordRaw, 'children'> {
@@ -27,7 +28,7 @@ const routes: Array<CustomRouteRecordRaw> = [
         ],
     },
     {
-        path: '/sign-ip',
+        path: '/sign-in',
         name: 'SignIn',
         component: () => import('@/views/auth/SignIn.vue'),
     },
@@ -45,5 +46,22 @@ const router = createRouter({
         return savedPosition || { left: 0, top: 0 }; // Управление прокруткой
     },
 });
+
+router.beforeEach((to, from, next) => {
+    const publicPages = ['/sign-in', '/sign-up', '/404', '/403'] // Публичные страницы
+    const authStore = useAuthStore()
+
+    // Проверка авторизации
+    if (!authStore.currentUser.isAuth) {
+        // Если пользователь не авторизован и пытается попасть на страницу, которая не публичная
+        if (!publicPages.includes(to.path)) {
+            return next('/sign-in') // Редирект на страницу входа
+        }
+    }
+
+    // Если мы не находимся на странице sign-in и не авторизованы, продолжаем переход
+    next()
+})
+
 
 export default router;

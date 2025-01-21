@@ -2,7 +2,10 @@ import {defineStore} from 'pinia';
 import {addUserFetch, getUserByLoginFetch} from "../../services/authService.ts";
 import {User} from "../../types/User.ts";
 
-const userFromLS = JSON.parse(localStorage.getItem('auth'))
+const userFromLS = localStorage.getItem('user')
+    ? JSON.parse(localStorage.getItem('user')!)
+    : null;
+
 
 interface authType extends User {
     isAuth: boolean;
@@ -20,10 +23,9 @@ export const useAuthStore = defineStore('authStore', {
                     throw new Error('Пользователь с таким логином уже существует'); // Выбрасываем ошибку
                 } else {
                     const response = await addUserFetch(params);
-                    console.log(response, '123')
-                    this.auth = response.data;  // Обновляем auth с полученными данными
-                    localStorage.setItem('user', JSON.stringify(this.auth))
+                    this.auth = response.data;
                     this.auth.isAuth = true
+                    localStorage.setItem('user', JSON.stringify(this.auth))
                 }
             } catch (error) {
                 throw error;
@@ -33,23 +35,33 @@ export const useAuthStore = defineStore('authStore', {
         async signIn(params: User) {
             try {
                 const findUserRes = await getUserByLoginFetch(params.login)
-                if (findUserRes.data.length > 0) {
-                    this.auth = findUserRes.data[0];  // Обновляем auth с полученными данными
-                    localStorage.setItem('user', JSON.stringify(this.auth))
-                    this.auth.isAuth = true
+                if (findUserRes.data.length > 0){
+                    if (params.password === findUserRes.data[0].password) {
+                        this.auth = findUserRes.data[0];  // Обновляем auth с полученными данными
+                        this.auth.isAuth = true
+                        localStorage.setItem('user', JSON.stringify(this.auth))
+                    } else {
+                        throw new Error('Неверный пароль'); // Более информативно
+                    }
                 }
+                else {
+                    throw new Error('Неверный логин'); // Более информативно
+                }
+
             } catch (error) {
                 throw error;
             }
         },
         async signOut(params: User) {
-            this.auth = {}
-            localStorage.removeItem('user')
-            this.auth.isAuth = false
+            this.auth = {isAuth: false} as authType;
+            localStorage.removeItem('user');
         }
     },
-    getters:{
-
+    getters: {
+        // Getter для получения текущего авторизованного пользователя
+        currentUser(state) {
+            return state.auth.isAuth ? state.auth : {isAuth: false};  // Если пользователь авторизован, возвращаем его данные
+        }
     }
 })
 

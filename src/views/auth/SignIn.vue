@@ -5,22 +5,25 @@ import {computed, reactive, ref} from "vue";
 import {User} from "@/types/User.ts";
 import {useAuthStore} from "@/store/auth/authStore.ts";
 import {toast} from 'vue3-toastify';
+import {useRouter} from "vue-router";
 
-const {addUser} = useAuthStore()
+const router = useRouter()
 
-const newYser = ref<User>({
+const {signIn} = useAuthStore()
+
+const params = ref<User>({
   login: '',
-  name: '',
   password: '',
 })
 
 const submit = async () => {
   try {
-    const res = await addUser(newYser.value)
-    toast("Регистрация прошла успешно!", {
+    const res = await signIn(params.value)
+    await toast("Авторизация прошла успешно!", {
       type: 'success',
       autoClose: 1000,
-    }); // ToastOptions
+    });
+    await router.push({name: 'Main'})
   } catch (error) {
     toast(error, {
       type: 'danger',
@@ -30,7 +33,7 @@ const submit = async () => {
 }
 
 const validate = computed(() => {
-  return !(newYser.value.login && newYser.value.password)
+  return !(params.value.login && params.value.password)
 })
 
 </script>
@@ -43,12 +46,12 @@ const validate = computed(() => {
 
       <!-- Логин -->
       <Input
-          v-model:value="newYser.login"
+          v-model:value="params.login"
           title="Логин"/>
 
       <!-- Пароль -->
       <Input
-          v-model:value="newYser.password"
+          v-model:value="params.password"
           title="Пароль"/>
 
       <!-- Кнопка регистрации -->
@@ -57,7 +60,7 @@ const validate = computed(() => {
             :disabled="validate"
             type="button"
             @click="submit"
-            title="Регистрация"/>
+            title="Войти"/>
       </div>
 
       <!-- Ссылка для перехода на страницу регистрации -->
