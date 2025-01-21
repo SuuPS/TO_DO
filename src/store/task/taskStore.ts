@@ -3,7 +3,7 @@ import {Options} from "../../components/UI/Select.vue";
 import { ref, computed } from 'vue';
 import {Task} from "../../types/taskTypes.ts";
 import {UserTypes} from "../../types/userTypes.ts";
-import {addTaskFetch, getAllTasks, removeTasksFetch} from "../../services/taskService.ts";
+import {addTaskFetch, getAllTasks, removeTasksFetch, editTaskFetch} from "../../services/taskService.ts";
 
 export const useTaskStore = defineStore('taskStore', () => {
 
@@ -33,9 +33,19 @@ export const useTaskStore = defineStore('taskStore', () => {
         }
     };
 
-    const fetchTasks = async () => {
+    const editTask = async (params: Task) => {
+        console.log(params, '234')
         try {
-            const response = await getAllTasks();
+            const response = await editTaskFetch(params);
+            fetchTasks()
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    const fetchTasks = async (params = {}) => {
+        try {
+            const response = await getAllTasks(params);
             tasks.value = response.data
         } catch (error) {
             throw error;
@@ -52,7 +62,8 @@ export const useTaskStore = defineStore('taskStore', () => {
         tasksList,
         addTask,
         fetchTasks,
-        deleteTask
+        deleteTask,
+        editTask
     };
 });
 

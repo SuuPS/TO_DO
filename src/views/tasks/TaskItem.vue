@@ -10,7 +10,6 @@ import {onMounted, ref} from "vue";
 import {Task} from "@/types/taskTypes.ts";
 import {toast} from "vue3-toastify";
 
-const { statusList, tasksList } = storeToRefs(useTaskStore())
 const { userList } = storeToRefs(useUsersStore())
 
 const { fetchUsers } = useUsersStore()

@@ -9,12 +9,19 @@ const removeTasksFetch = async (id: string) => {
     return await api.delete(`/tasks/${id}`,);
 }
 
-const getAllTasks = async () => {
-    return await api.get(`/tasks`);
+const editTaskFetch = async (params: Task) => {
+    return await api.put(`/tasks/${params.id}`, {...params, edit: false});
+}
+
+const getAllTasks = async (params = {}) => {
+    return await api.get(`/tasks`, {
+        params: {...params}
+    });
 }
 
 export {
     addTaskFetch,
     getAllTasks,
-    removeTasksFetch
+    removeTasksFetch,
+    editTaskFetch
 }

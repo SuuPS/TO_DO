@@ -9,7 +9,8 @@ interface Props {
   id?: string,
   title?: string,
   disabled?: boolean,
-  options: Options[]
+  options: Options[],
+  reset?: boolean
 }
 
 const value = defineModel('value')
@@ -19,7 +20,9 @@ const props = defineProps<Props>()
 
 <template>
   <div>
-    <label :for="id" class="block text-sm font-medium text-gray-700">{{title}}</label>
+    <label :for="id" class="block text-sm font-medium text-gray-700">{{title}}
+      <span v-if="reset" @click="value = null" class="cursor-pointer text-yellow-500">Очистить</span>
+    </label>
     <select
         :disabled="disabled"
         v-model="value"
